@@ -131,7 +131,7 @@ namespace LinksTask.Controllers
         linkToUpdate.ViewCount++;
         _context.SaveChanges();
       }
-      Response.Redirect(longLink, true);
+      Response.Redirect(longLink, false);
     }
   }
 }

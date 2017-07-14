@@ -18,6 +18,7 @@ export class HomeComponent
     //Service request to add a new link, response is a short link to be shown to the user
     addItem(longLink: string, valid: boolean) {
         this.valid = valid;
-        this.dataService.addData(longLink).subscribe(value => this.shortLink = value);
+        if (valid)
+          this.dataService.addData(longLink).subscribe(value => this.shortLink = value);
     }
 }

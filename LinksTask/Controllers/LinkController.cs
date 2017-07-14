@@ -9,6 +9,7 @@ using LinksTask.Models;
 using LinksTask.Data;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System.Net;
 
 namespace LinksTask.Controllers
 {
@@ -73,6 +74,8 @@ namespace LinksTask.Controllers
           longLink = "https://" + longLink;
         }
       }
+      if (!longLink.EndsWith("/")) 
+        longLink += '/';
 
       //Check if the link is already in database, get its short link if it is,
       //create new entry otherwise
@@ -129,8 +132,8 @@ namespace LinksTask.Controllers
       //Check if short link is valid
       if (shortLink == null || shortLink.Length != stringLength)
       {
-        Response.Redirect("/");
-        return;
+         Response.StatusCode = 404;
+         return ;
       }
       string longLink = null;
       Link linkToUpdate = null;
@@ -142,7 +145,7 @@ namespace LinksTask.Controllers
       }
       if (longLink == null)
       {
-        Response.Redirect("/");
+        Response.StatusCode = 404;
         return;
       }
       //View count is increased in database
@@ -152,6 +155,7 @@ namespace LinksTask.Controllers
         _context.SaveChanges();
       }
       Response.Redirect(longLink, false);
+      return;
     }
   }
 }

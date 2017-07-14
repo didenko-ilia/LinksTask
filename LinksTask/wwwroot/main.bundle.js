@@ -37,6 +37,7 @@ var AppComponent = (function () {
     function AppComponent() {
         this.tabs = ["active", ""];
     }
+    //Initialization, opens the tab that was previously used
     AppComponent.prototype.ngOnInit = function () {
         var activeTab = localStorage.getItem("activeTab");
         if (activeTab == "List") {
@@ -48,7 +49,7 @@ var AppComponent = (function () {
             this.tabs[1] = "";
         }
     };
-    //
+    //Save active tab in case of page refresh
     AppComponent.prototype.homeTab = function () {
         localStorage.setItem("activeTab", "Home");
     };
@@ -95,11 +96,6 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 
 
 
-/*const appRoutes: Routes = [
-    { path: 'list', component: ListComponent },
-    { path: '', component: HomeComponent },
-    { path: 'home', component: HomeComponent }
-];*/
 var AppModule = (function () {
     function AppModule() {
     }
@@ -116,7 +112,6 @@ AppModule = __decorate([
             __WEBPACK_IMPORTED_MODULE_0__angular_platform_browser__["a" /* BrowserModule */],
             __WEBPACK_IMPORTED_MODULE_6__angular_forms__["a" /* FormsModule */],
             __WEBPACK_IMPORTED_MODULE_7__angular_http__["a" /* HttpModule */]
-            //RouterModule.forRoot(appRoutes)
         ],
         providers: [__WEBPACK_IMPORTED_MODULE_2__data_service__["a" /* DataService */]],
         bootstrap: [__WEBPACK_IMPORTED_MODULE_3__app_component__["a" /* AppComponent */]]
@@ -155,6 +150,7 @@ var DataService = (function () {
         this._httpService = _httpService;
         this.data = [];
     }
+    //Server request to get initial data based on cookies
     DataService.prototype.getData = function () {
         var _this = this;
         this._httpService.get('/link').subscribe(function (values) {
@@ -165,12 +161,14 @@ var DataService = (function () {
         });
         return this.data;
     };
+    //Server request to add a new link
     DataService.prototype.addData = function (longLink) {
         var _this = this;
         return this._httpService.get('/link/NewLink?longlink=' + longLink).map(function (values) {
             var jsonObj = values.json();
             var shortLink = jsonObj["ShortLink"];
             if (jsonObj["ViewCount"] != -1) {
+                //Link is already on our list, view count is updated
                 for (var _i = 0, _a = _this.data; _i < _a.length; _i++) {
                     var item = _a[_i];
                     if (item.shortLink == shortLink) {
@@ -180,6 +178,7 @@ var DataService = (function () {
                 }
             }
             else {
+                //Link is not on our list, add new entry
                 _this.data.push(new __WEBPACK_IMPORTED_MODULE_1__link__["a" /* Link */](jsonObj["ShortLink"], jsonObj["LongLink"], 0));
             }
             return shortLink;
@@ -228,10 +227,12 @@ var HomeComponent = (function () {
         this.shortLink = "";
         this.valid = true;
     }
+    //Service request to add a new link, response is a short link to be shown to the user
     HomeComponent.prototype.addItem = function (longLink, valid) {
         var _this = this;
         this.valid = valid;
-        this.dataService.addData(longLink).subscribe(function (value) { return _this.shortLink = value; });
+        if (valid)
+            this.dataService.addData(longLink).subscribe(function (value) { return _this.shortLink = value; });
     };
     return HomeComponent;
 }());
@@ -297,6 +298,7 @@ var ListComponent = (function () {
         this.apiValue = [];
     }
     ;
+    //Initialization, service request for initial data based on cookies
     ListComponent.prototype.ngOnInit = function () {
         this.apiValue = this.dataService.getData();
     };

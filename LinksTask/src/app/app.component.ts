@@ -1,30 +1,34 @@
 ﻿import { Component, OnInit } from '@angular/core';
-import { DataService } from './data.service';
-import { Link } from './link';
-
-import 'rxjs/add/operator/map';
-import { Observable } from "rxjs/Observable";
-
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  //styleUrls: ['./app.component.css'],
-  providers: [DataService]
+    selector: 'app-root',
+    templateUrl: './app.component.html'
 })
 export class AppComponent implements OnInit {
+    tabs: string[] = ["active", ""];
 
-    constructor(private dataService: DataService) {}
-    
-    shortLink: string = "";
-    apiValue: Link[] = [];
-
-    addItem(longLink: string)
-    {
-        this.dataService.addData(longLink).subscribe(value => this.shortLink = value);
-    }
-    
+    //Initialization, opens the tab that was previously used
     ngOnInit() {
-        this.apiValue = this.dataService.getData();
+        var activeTab = localStorage.getItem("activeTab");
+        if (activeTab == "List") {
+            this.tabs[0] = "";
+            this.tabs[1] = "active";
+        }
+        else {
+            this.tabs[0] = "active";
+            this.tabs[1] = "";
+        }
+      
+    }
+
+    //Save active tab in case of page refresh
+    homeTab()
+    {
+        localStorage.setItem("activeTab", "Home");
+    }
+
+    listTab()
+    {
+        localStorage.setItem("activeTab", "List");
     }
 }

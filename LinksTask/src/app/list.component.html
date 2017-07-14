@@ -1,0 +1,24 @@
+﻿<div class="panel">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Short link</th>
+        <th>Long link</th>
+        <th>View count</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of apiValue">
+        <td>
+          <a href="/link/{{item.shortLink}}" target="_blank">
+            <a *ngIf="item.shortLink">linkstask2017.azurewebsites.net/link/</a>{{item.shortLink}}
+          </a>
+        </td>
+        <td>
+          <a href={{item.longLink}} target="_blank">{{item.longLink}}</a>
+        </td>
+        <td>{{item.viewCount}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

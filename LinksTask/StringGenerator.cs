@@ -8,6 +8,8 @@ namespace LinksTask
   public class StringGenerator
   {
     private static Random random = new Random();
+
+    //Generating new short link of set length
     public static string RandomString(int length)
     {
       const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";

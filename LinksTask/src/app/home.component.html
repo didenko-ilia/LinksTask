@@ -1,0 +1,10 @@
+﻿<div class="input-group">
+  <input type="url" class="form-control" [(ngModel)]="longLink" name="url" id="url"
+         placeholder="URL" (keyup.enter)="addItem(longLink, url.valid)" #url="ngModel"
+         required pattern="^(https?:\/\/)?([0-9a-zA-Z-]+){1}(\.[A-Za-z]+)+(\/[@A-Za-z0-9.-]+)*\/?[?]?([A-Za-z0-9=]*)?$">
+  <span class="input-group-btn">
+    <button class="btn btn-secondary" (click)="addItem(longLink, url.valid)" type="button">Go!</button>
+  </span>
+</div>
+<h3 align="center" *ngIf="shortLink&&valid"> New Link: <a href="/link/{{shortLink}}">linkstask2017.azurewebsites.net/link/{{shortLink}} </a> </h3>
+<h3 align="center" *ngIf="!valid"> Please insert a valid URL! </h3>

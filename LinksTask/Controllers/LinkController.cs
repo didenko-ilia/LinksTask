@@ -8,8 +8,7 @@ using Microsoft.AspNetCore.Http;
 using LinksTask.Models;
 using LinksTask.Data;
 using Microsoft.EntityFrameworkCore;
-
-// For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using Newtonsoft.Json;
 
 namespace LinksTask.Controllers
 {
@@ -18,6 +17,7 @@ namespace LinksTask.Controllers
   {
     private readonly LinkContext _context;
 
+    //Length of a short link in use
     private int stringLength = 8;
 
     public LinkController(LinkContext context)
@@ -26,6 +26,7 @@ namespace LinksTask.Controllers
     }
 
     // GET: /link/
+    // Get initial data from database based on cookies
     [HttpGet("/link")]
     public string Index()
     {
@@ -41,19 +42,26 @@ namespace LinksTask.Controllers
           if (!first) response += ',';
           else first = !first;
           Link dbInfo = _context.Links.FirstOrDefault(e => e.ShortLink == shortLink);
-          response += "{\"shortLink\":\"" + shortLink + "\",\"longLink\":\"" + dbInfo.LongLink + "\",\"viewCount\":" + dbInfo.ViewCount + "}";
+          response += JsonConvert.SerializeObject(dbInfo);
         }
       }
       response += ']';
       return response;
     }
 
+    //Get: /link/NewLink?longLink=value
     [HttpGet("/link/NewLink/{longLink?}")]
     public string NewLink([Bind("longlink")] string longLink)
     {
+      if (longLink == null)
+      {
+        Response.Redirect("/");
+        return null;
+      }
       string shortLink;
       Link link = new Link();
-      int viewCount;
+
+      //Transform the link to 'https://' format
       if (!longLink.StartsWith("https://"))
       {
         if (longLink.StartsWith("http://"))
@@ -65,26 +73,28 @@ namespace LinksTask.Controllers
           longLink = "https://" + longLink;
         }
       }
-      int count = _context.Links.Count(e => e.LongLink == longLink);
-      if (count != 0)
+
+      //Check if the link is already in database, get its short link if it is,
+      //create new entry otherwise
+      if (_context.Links.Count(e => e.LongLink == longLink) != 0)
       {
         link = _context.Links.FirstOrDefault(e => e.LongLink == longLink);
         shortLink = link.ShortLink;
-        viewCount = link.ViewCount;
       }
       else
       {
         shortLink = StringGenerator.RandomString(stringLength);
         while (_context.Links.Count(e => e.ShortLink == shortLink) > 0)
           shortLink = StringGenerator.RandomString(stringLength);
-        viewCount = 0;
         link.ShortLink = shortLink;
         link.LongLink = longLink;
         link.ViewCount = 0;
         _context.Links.Add(link);
         _context.SaveChanges();
+        link.ViewCount = -1;
       }
 
+      //Check if the short link is already mentioned in cookies, add if not
       string cookies = Request.Cookies["shortlink"];
       bool exists = false;
       if (cookies != null)
@@ -106,26 +116,36 @@ namespace LinksTask.Controllers
       cookieOptions.Expires = (DateTime.Now.AddDays(1));
       Response.Cookies.Append("shortlink", cookies, cookieOptions);
 
-      string response = "{\"exists\":\"" + exists + "\",\"shortLink\":\"" + shortLink + "\",\"longLink\":\"" + longLink + "\",\"viewCount\":" + viewCount + "}";
+      string response = JsonConvert.SerializeObject(link);
 
       return response;
     }
 
+    //Redirect from the short link
+    //GET: /link/shortlink
     [HttpGet("/link/{shortLink}")]
     public void Index([Bind("shortLink")]string shortLink)
     {
+      //Check if short link is valid
       if (shortLink == null || shortLink.Length != stringLength)
       {
-        NotFound();
+        Response.Redirect("/");
         return;
       }
-      var linkToUpdate = _context.Links.SingleOrDefault(e => e.ShortLink == shortLink);
-      string longLink = linkToUpdate.LongLink;
+      string longLink = null;
+      Link linkToUpdate = null;
+      //Get corresponding long link from the database and check its validity
+      if (_context.Links.Count(e => e.ShortLink == shortLink) > 0)
+      {
+        linkToUpdate = _context.Links.FirstOrDefault(e => e.ShortLink == shortLink);
+        longLink = linkToUpdate.LongLink;
+      }
       if (longLink == null)
       {
-        NotFound();
+        Response.Redirect("/");
         return;
       }
+      //View count is increased in database
       if (linkToUpdate != null)
       {
         linkToUpdate.ViewCount++;

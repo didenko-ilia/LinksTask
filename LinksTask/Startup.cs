@@ -36,12 +36,21 @@ namespace LinksTask
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, LinkContext linkContext)
         {
+            app.UseStatusCodePagesWithReExecute("/");
+
             app.UseMvcWithDefaultRoute();
 
-            app.UseDefaultFiles();
-            app.UseStaticFiles();
+            app.UseFileServer();
 
             DbInitializer.Initialize(linkContext);
+
+            app.Run(context =>
+            {
+                context.Response.StatusCode = 404;
+                return Task.FromResult(0);
+            });
+
+            
         }
     }
 }

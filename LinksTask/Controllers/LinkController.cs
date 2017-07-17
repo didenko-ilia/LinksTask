@@ -63,15 +63,15 @@ namespace LinksTask.Controllers
       Link link = new Link();
 
       //Transform the link to 'https://' format
-      if (!longLink.StartsWith("https://"))
+      if (!longLink.StartsWith("http://"))
       {
-        if (longLink.StartsWith("http://"))
+        if (longLink.StartsWith("https://"))
         {
-          longLink = longLink.Insert(4, "s");
+          longLink = longLink.Remove(4, 1);
         }
         else
         {
-          longLink = "https://" + longLink;
+          longLink = "http://" + longLink;
         }
       }
       if (!longLink.EndsWith("/")) 
@@ -132,8 +132,8 @@ namespace LinksTask.Controllers
       //Check if short link is valid
       if (shortLink == null || shortLink.Length != stringLength)
       {
-         Response.StatusCode = 404;
-         return ;
+        Response.StatusCode = 404;
+        return ;
       }
       string longLink = null;
       Link linkToUpdate = null;

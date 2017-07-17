@@ -1,16 +1,6 @@
 ﻿<div class="page-header">
   <h1 align="center">Short links</h1>
 </div>
-<ul class="nav nav-pils nav-justified">
-  <li class="{{tabs[0]}}"><a data-toggle="tab" (click)="homeTab()" href="#home">Home</a></li>
-  <li class="{{tabs[1]}}"><a data-toggle="tab" (click)="listTab()" href="#list">List</a></li>
-</ul>
-<div class="tab-content">
-  <div class="tab-pane {{tabs[0]}}" id="home">
-     <home-app></home-app>   
-  </div>
-  <div class="tab-pane {{tabs[1]}}" id="list">
-    <list-app></list-app>
-  </div>
-</div>
+<router-outlet></router-outlet>
+
   

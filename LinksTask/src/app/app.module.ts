@@ -13,7 +13,6 @@ import { Routes, RouterModule } from '@angular/router';
 const appRoutes: Routes = [
     { path: '', component: MainComponent },
     { path: 'home', component: MainComponent },
-    //{ path: 'not-found', component: NotFoundComponent },
     { path: '**', component: NotFoundComponent }
 ]
 

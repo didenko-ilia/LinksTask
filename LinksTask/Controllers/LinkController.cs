@@ -116,7 +116,7 @@ namespace LinksTask.Controllers
         cookies = shortLink;
       }
       CookieOptions cookieOptions = new CookieOptions();
-      cookieOptions.Expires = (DateTime.Now.AddDays(1));
+      cookieOptions.Expires = (DateTime.Now.AddYears(1));
       Response.Cookies.Append("shortlink", cookies, cookieOptions);
 
       string response = JsonConvert.SerializeObject(link);
